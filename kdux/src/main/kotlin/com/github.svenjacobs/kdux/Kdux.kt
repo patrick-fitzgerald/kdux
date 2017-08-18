@@ -6,8 +6,8 @@ object Kdux {
     @JvmStatic
     fun <State, Action> createStore(reducer: Reducer<State, Action>,
                                     initialState: State? = null,
-                                    middlewares: Set<Middleware<State, Action>> = emptySet()) =
-            Store(reducer = reducer,
-                  initialState = initialState,
-                  middlewares = middlewares)
+                                    middlewares: Set<Middleware<State, Action>> = emptySet()): Store<State, Action> =
+            StoreImpl(reducer = reducer,
+                      initialState = initialState,
+                      middlewares = middlewares)
 }

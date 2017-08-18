@@ -3,13 +3,27 @@ package com.github.svenjacobs.kdux
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-class Store<State, in Action> internal constructor(private val reducer: Reducer<State, Action>,
-                                                   initialState: State? = null,
-                                                   middlewares: Set<Middleware<State, Action>> = emptySet()) {
+interface Subscription {
 
-    inner class Subscription internal constructor(private val listener: Listener) {
+    fun unsubscribe(): Boolean
+}
 
-        fun unsubscribe() = listeners.remove(listener)
+interface Store<out State, in Action> {
+
+    val state: State?
+
+    fun dispatch(action: Action)
+
+    fun subscribe(listener: Listener): Subscription
+}
+
+internal class StoreImpl<State, in Action>(private val reducer: Reducer<State, Action>,
+                                           initialState: State? = null,
+                                           middlewares: Set<Middleware<State, Action>> = emptySet()) : Store<State, Action> {
+
+    internal inner class SubscriptionImpl(private val listener: Listener) : Subscription {
+
+        override fun unsubscribe() = listeners.remove(listener)
     }
 
     private val reducerMiddleware = { _: State?, action: Action, _: NextMiddleware<Action> ->
@@ -21,10 +35,10 @@ class Store<State, in Action> internal constructor(private val reducer: Reducer<
     private val middlewares = middlewares + reducerMiddleware
 
     @Volatile
-    var state: State? = initialState
+    override var state: State? = initialState
         private set
 
-    fun dispatch(action: Action) {
+    override fun dispatch(action: Action) {
         lock.withLock {
             val iterator = middlewares.iterator()
 
@@ -37,8 +51,8 @@ class Store<State, in Action> internal constructor(private val reducer: Reducer<
         }
     }
 
-    fun subscribe(listener: Listener) =
-            Subscription(listener).also {
+    override fun subscribe(listener: Listener) =
+            SubscriptionImpl(listener).also {
                 listeners.add(listener)
             }
 }
