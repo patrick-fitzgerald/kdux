@@ -1,8 +1,5 @@
 package com.github.svenjacobs.kdux
 
-import com.svenjacobs.kdux.Action
-import com.svenjacobs.kdux.State
-import com.svenjacobs.kdux.reducer
 import io.kotlintest.matchers.*
 import io.kotlintest.specs.StringSpec
 

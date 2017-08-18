@@ -1,7 +1,5 @@
 package com.github.svenjacobs.kdux
 
-import com.svenjacobs.kdux.Action
-import com.svenjacobs.kdux.reducer
 import io.kotlintest.matchers.beEmpty
 import io.kotlintest.matchers.haveSize
 import io.kotlintest.matchers.should

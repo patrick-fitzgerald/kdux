@@ -1,4 +1,4 @@
-package com.svenjacobs.kdux
+package com.github.svenjacobs.kdux
 
 data class User(val firstName: String,
                 val lastName: String)
