@@ -27,7 +27,9 @@ internal class StoreImpl<State, in Action>(private val reducer: Reducer<State, A
     }
 
     private val reducerMiddleware = { _: State?, action: Action, _: NextMiddleware<Action> ->
-        state = reducer(state, action)
+        lock.withLock {
+            state = reducer(state, action)
+        }
         listeners.forEach(Listener::invoke)
     }
     private val lock = ReentrantLock()
@@ -39,16 +41,14 @@ internal class StoreImpl<State, in Action>(private val reducer: Reducer<State, A
         private set
 
     override fun dispatch(action: Action) {
-        lock.withLock {
-            val iterator = middlewares.iterator()
+        val iterator = middlewares.iterator()
 
-            fun next(nextAction: Action) {
-                if (iterator.hasNext())
-                    iterator.next()(state, nextAction, ::next)
-            }
-
-            iterator.next()(state, action, ::next)
+        fun next(nextAction: Action) {
+            if (iterator.hasNext())
+                iterator.next()(state, nextAction, ::next)
         }
+
+        iterator.next()(state, action, ::next)
     }
 
     override fun subscribe(listener: Listener) =
