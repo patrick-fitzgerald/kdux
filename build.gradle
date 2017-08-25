@@ -13,7 +13,7 @@ plugins {
 
 subprojects {
     group 'com.github.svenjacobs'
-    version '0.1-SNAPSHOT'
+    version '0.1'
 
     apply plugin: 'maven-publish'
     apply plugin: 'kotlin'
